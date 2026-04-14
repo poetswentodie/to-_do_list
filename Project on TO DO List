@@ -1,0 +1,141 @@
+import os
+import json
+
+FILE_NAME = "tasks.json"
+
+# Load tasks
+def load_tasks():
+    if os.path.exists(FILE_NAME):
+        with open(FILE_NAME, "r") as file:
+            return json.load(file)
+    return []
+
+# Save tasks
+def save_tasks(tasks):
+    with open(FILE_NAME, "w") as file:
+        json.dump(tasks, file, indent=4)
+
+# Display tasks
+def view_tasks(tasks):
+    if not tasks:
+        print("\nNo tasks found.\n")
+        return
+
+    print("\nYour Tasks:\n")
+    for i, task in enumerate(tasks):
+        status = "✔" if task["done"] else "✘"
+        print(f"{i+1}. [{status}] {task['title']} (Priority: {task['priority']})")
+    print()
+
+# Add task
+def add_task(tasks):
+    title = input("Enter task title: ")
+    priority = input("Enter priority (Low/Medium/High): ")
+
+    task = {
+        "title": title,
+        "priority": priority,
+        "done": False
+    }
+
+    tasks.append(task)
+    save_tasks(tasks)
+    print("Task added successfully!\n")
+
+# Delete task
+def delete_task(tasks):
+    view_tasks(tasks)
+    try:
+        index = int(input("Enter task number to delete: ")) - 1
+        removed = tasks.pop(index)
+        save_tasks(tasks)
+        print(f"Deleted: {removed['title']}\n")
+    except:
+        print("Invalid input!\n")
+
+# Mark complete
+def mark_complete(tasks):
+    view_tasks(tasks)
+    try:
+        index = int(input("Enter task number to mark complete: ")) - 1
+        tasks[index]["done"] = True
+        save_tasks(tasks)
+        print("Task marked as complete!\n")
+    except:
+        print("Invalid input!\n")
+
+# Update task
+def update_task(tasks):
+    view_tasks(tasks)
+    try:
+        index = int(input("Enter task number to update: ")) - 1
+        new_title = input("Enter new title: ")
+        new_priority = input("Enter new priority: ")
+
+        tasks[index]["title"] = new_title
+        tasks[index]["priority"] = new_priority
+
+        save_tasks(tasks)
+        print("Task updated!\n")
+    except:
+        print("Invalid input!\n")
+
+# Search task
+def search_task(tasks):
+    keyword = input("Enter keyword to search: ")
+    found = False
+
+    for i, task in enumerate(tasks):
+        if keyword.lower() in task["title"].lower():
+            status = "✔" if task["done"] else "✘"
+            print(f"{i+1}. [{status}] {task['title']} (Priority: {task['priority']})")
+            found = True
+
+    if not found:
+        print("No matching tasks found.\n")
+
+# Sort tasks
+def sort_tasks(tasks):
+    tasks.sort(key=lambda x: x["priority"])
+    save_tasks(tasks)
+    print("Tasks sorted by priority!\n")
+
+# Main menu
+def menu():
+    tasks = load_tasks()
+
+    while True:
+        print("====== TO-DO LIST MENU ======")
+        print("1. View Tasks")
+        print("2. Add Task")
+        print("3. Delete Task")
+        print("4. Mark Task Complete")
+        print("5. Update Task")
+        print("6. Search Task")
+        print("7. Sort Tasks")
+        print("8. Exit")
+
+        choice = input("Enter your choice: ")
+
+        if choice == "1":
+            view_tasks(tasks)
+        elif choice == "2":
+            add_task(tasks)
+        elif choice == "3":
+            delete_task(tasks)
+        elif choice == "4":
+            mark_complete(tasks)
+        elif choice == "5":
+            update_task(tasks)
+        elif choice == "6":
+            search_task(tasks)
+        elif choice == "7":
+            sort_tasks(tasks)
+        elif choice == "8":
+            print("Goodbye!")
+            break
+        else:
+            print("Invalid choice!\n")
+
+
+menu()
